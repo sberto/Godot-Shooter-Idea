@@ -1,0 +1,126 @@
+[gd_scene load_steps=16 format=3 uid="uid://belba1at18fc1"]
+
+[ext_resource type="Shader" path="res://final_camera.gdshader" id="1_loyv5"]
+[ext_resource type="Shader" path="res://shooter_graphics.gdshader" id="1_pqdjn"]
+[ext_resource type="Script" path="res://rotate.gd" id="1_twexe"]
+[ext_resource type="Script" path="res://camera.gd" id="2_2poa0"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tqjkj"]
+sky_top_color = Color(0, 0, 0, 1)
+sky_horizon_color = Color(0.5, 0.5, 0.5, 1)
+sky_energy_multiplier = 0.0
+ground_bottom_color = Color(0, 0, 0, 1)
+ground_horizon_color = Color(0.5, 0.5, 0.5, 1)
+
+[sub_resource type="Sky" id="Sky_pxikp"]
+sky_material = SubResource("ProceduralSkyMaterial_tqjkj")
+
+[sub_resource type="Environment" id="Environment_4nmlh"]
+background_mode = 2
+sky = SubResource("Sky_pxikp")
+
+[sub_resource type="BoxMesh" id="BoxMesh_3v8t2"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_dlq2y"]
+viewport_path = NodePath("Enemy")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_hiff4"]
+viewport_path = NodePath("World")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p5qii"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("1_loyv5")
+shader_parameter/camera1 = SubResource("ViewportTexture_dlq2y")
+shader_parameter/camera2 = SubResource("ViewportTexture_hiff4")
+
+[sub_resource type="QuadMesh" id="QuadMesh_p0nly"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gxnun"]
+albedo_color = Color(0.455249, 0.265785, 0.439541, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_jvnc1"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w4085"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("1_pqdjn")
+shader_parameter/start_point = Projection(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+shader_parameter/pulse_width = 2.0
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/radius = 5.0
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_4nmlh")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(4.76815, 0, 0, 0, 1.18688, 0, 0, 0, 10.6035, -3.02182, -0.216339, -5.68859)
+mesh = SubResource("BoxMesh_3v8t2")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(-2.60263, 0, -7.38383, 0, 1, 0, 1.44974, 0, -13.2558, 2.41537, -0.216339, -11.5259)
+mesh = SubResource("BoxMesh_3v8t2")
+
+[node name="Camera" type="Camera3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(0.89406, 0, -0.447946, 0, 1, 0, 0.447946, 0, 0.89406, -3.36411, 1.20486, -0.0996896)
+cull_mask = 1048572
+script = ExtResource("1_twexe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Camera"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.317425)
+layers = 4
+material_override = SubResource("ShaderMaterial_p5qii")
+mesh = SubResource("QuadMesh_p0nly")
+
+[node name="Enemy" type="SubViewport" parent="."]
+transparent_bg = true
+canvas_cull_mask = 4294967293
+
+[node name="Node3D" type="Node3D" parent="Enemy"]
+
+[node name="EnemyMesh" type="MeshInstance3D" parent="Enemy/Node3D"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.54073, 1.41647, -5.03759)
+layers = 2
+material_override = SubResource("StandardMaterial3D_gxnun")
+mesh = SubResource("CapsuleMesh_jvnc1")
+skeleton = NodePath("../../..")
+
+[node name="Enemy" type="Camera3D" parent="Enemy/Node3D"]
+transform = Transform3D(0.89406, 0, -0.447946, 0, 1, 0, 0.447946, 0, 0.89406, -3.36411, 1.20486, -0.0996896)
+cull_mask = 1048570
+script = ExtResource("2_2poa0")
+
+[node name="World" type="SubViewport" parent="."]
+transparent_bg = true
+canvas_cull_mask = 4294967293
+
+[node name="World" type="Camera3D" parent="World"]
+transform = Transform3D(0.89406, 0, -0.447946, 0, 1, 0, 0.447946, 0, 0.89406, -3.36411, 1.20486, -0.0996896)
+cull_mask = 1048569
+script = ExtResource("2_2poa0")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="World/World"]
+transform = Transform3D(0.89406, 0, 0.447946, 0, 1, 0, -0.447946, 0, 0.89406, -0.0537882, 0.000139475, -0.106742)
+material_override = SubResource("ShaderMaterial_w4085")
+mesh = SubResource("QuadMesh_p0nly")
+skeleton = NodePath("../..")
+
+[node name="OmniLight3D2" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.737808, 0, 0.675011, -0.13806, -0.97886, 0.150904, 0.660741, -0.20453, -0.722211, -0.241434, 2.81118, -7.7759)
+layers = 2
+
+[node name="OmniLight3D3" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.617915, -1.49012e-08, -0.786245, 0.160811, -0.97886, 0.126382, -0.769624, -0.20453, -0.604852, -0.241434, 2.81118, -7.7759)
+layers = 2
+
+[node name="OmniLight3D4" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.871975, -1.49012e-08, -0.48955, 0.100128, -0.97886, -0.178345, -0.479201, -0.20453, 0.853542, -0.241434, 2.81118, -7.7759)
+layers = 2
+
+[node name="OmniLight3D5" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.871975, -1.49012e-08, -0.48955, 0.100128, -0.97886, -0.178345, -0.479201, -0.20453, 0.853542, -0.241434, 2.81118, -7.7759)
+layers = 2
